@@ -1,0 +1,65 @@
+# import the libraries 
+from datetime import timedelta 
+from airflow import DAG 
+from airflow.operators.bash_operator import Bashoperator 
+from airflow.utils.dates import days ago
+
+#defining DAG arguments default  Task 1.1
+args = { 
+    owner': 'Mital Bhalani', 
+    start_date': today, 
+    'email': ['mitalbhalani@somemail.com'], 
+    'email_on_failure':True, 
+    'email_on_retry':True, 'retries':1, 
+    'retry_delay': timedelta(minutes=5),
+       }
+       
+#defining the DAG Task 1.2 
+dag = DAG(
+    'ETL_toll_data, 
+    default_args=default_args, 
+    description='Apache Airflow Final Assignment', 
+    schedule_interval=timedelta(days=1),
+        )
+
+#define the Tasks 1.3
+#define the first Task 
+unzip_data = BashOperator(
+    task_id='unzip', 
+    bash_command='tar zxvf /home/project/airflow/dags/finalassignment/tolldata.tgz -C /home/project/airflow/dags/finalassignment/", 
+    dag=dag,
+    )
+
+# define the task 1.4   
+#Define The Second Task 
+extract_data_from_csv = BashOperator(
+    task_id='extract_data_from_csv', 
+    bash_command='cut -d"," --1,2,3,4,5 vehicle-data.csv > csv_data.csv", 
+    dag=dag,)
+
+# define the task 1.5 
+#Define The Third Task
+extract_data_from_tsv = BashOperator(
+    task_id='extract_data_from_tsv', 
+    bash command='cut-d"~" --1,2,3 tollplaza-data.csv > tsv_data.csv", \
+    dag=dag,
+    )
+
+#Define The Task 1.6
+#Define The Fourth Task
+extract_data_from_fixed_width = BashOperator (
+    task_id='extract_data_from_fixed_width', 
+    bash_command='cut -d" " --1,2 payment-data.txt > fixed Width data.csv", 
+    dag=dag,
+    )
+
+#Define The Task 1.7
+    consolidate_data = BashOperator(
+    task_id='consolidate_data", 
+    bash_command='paste csv_data.csv tsv_data.csv fixed_width_data.csv > extracted_data.csv', 
+    dag=dag,
+    )
+
+#Task Pipeline 1.8
+unzip data >> extract_data_from_csv >> extract_data_from_tsv >> extract_data_from_fixed_width >> consolidate_data >> transform_data
+
